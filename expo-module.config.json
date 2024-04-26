@@ -1,0 +1,9 @@
+{
+  "platforms": ["ios", "tvos", "android", "web"],
+  "ios": {
+    "modules": ["ExpoHealthKitModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.healthkit.ExpoHealthKitModule"]
+  }
+}
