@@ -1,5 +1,5 @@
 {
-  "name": "expo-healthkit",
+  "name": "@yzlin/expo-healthkit",
   "version": "0.1.0",
   "description": "Expo binding for HealthKit",
   "main": "build/index.js",
@@ -28,8 +28,7 @@
   "author": "Ethan Lin <yzlin1985@gmail.com> (https://github.com/yzlin)",
   "license": "MIT",
   "homepage": "https://github.com/yzlin/expo-healthkit#readme",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "@biomejs/biome": "1.7.1",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
