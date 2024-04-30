@@ -4,7 +4,14 @@
 __mocks__
 __tests__
 
+/.cz.toml
+/.eslintrc.js
+/.pre-commit-config.yaml
+/.prettierrc.js
+/.tool-versions
 /babel.config.js
+/biome.json
+/bun.lockb
 /android/src/androidTest/
 /android/src/test/
 /android/build/
