@@ -1,5 +1,6 @@
 import ExpoHealthKit, {
   HKAuthorizationRequestStatus,
+  HKCharacteristicTypeIdentifier,
   HKQuantityTypeIdentifier,
   HKStatisticsOptions,
   useHealthKitAuthorization,
@@ -9,7 +10,13 @@ import { StyleSheet, Text, View } from "react-native";
 
 export default function App() {
   const { authorizationStatus, requestAuthorization } =
-    useHealthKitAuthorization([HKQuantityTypeIdentifier.stepCount], []);
+    useHealthKitAuthorization(
+      [
+        HKQuantityTypeIdentifier.stepCount,
+        HKCharacteristicTypeIdentifier.biologicalSex,
+      ],
+      [],
+    );
 
   useEffect(
     ($) => {
@@ -20,6 +27,9 @@ export default function App() {
         ) {
           await $.requestAuthorization();
         }
+
+        const bioSex = await ExpoHealthKit.getBiologicalSex();
+        console.log("🚀 ~ bioSex:", bioSex);
 
         const statisticsCollection =
           await ExpoHealthKit.queryStatisticsCollectionForQuantity({

@@ -1,6 +1,7 @@
 import "expo-modules-core";
 
 import {
+  getBiologicalSex,
   getRequestStatusForAuthorization,
   isHealthDataAvailable,
   queryStatisticsCollectionForQuantity,
@@ -28,6 +29,11 @@ export default {
   isHealthDataAvailable,
   supportsHealthRecords,
   getRequestStatusForAuthorization,
+
+  // Characteristic
+  getBiologicalSex,
+
+  // Query Statistics
   queryStatisticsCollectionForQuantity,
   queryStatisticsForQuantity,
   // addChangeListener,

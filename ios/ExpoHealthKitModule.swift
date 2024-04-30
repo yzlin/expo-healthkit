@@ -97,6 +97,19 @@ public class ExpoHealthKitModule: Module {
       }
     }
 
+    AsyncFunction("getBiologicalSex") { (promise: Promise) in
+      guard let store = store else {
+        throw InvalidStoreException()
+      }
+
+      do {
+        let bioSex = try store.biologicalSex()
+        promise.resolve(bioSex.biologicalSex.rawValue)
+      } catch {
+        promise.reject(error)
+      }
+    }
+
     AsyncFunction("queryStatisticsForQuantity") { (options: QueryStatisticsOptions, promise: Promise) in
       guard let store = store else {
         throw InvalidStoreException()
