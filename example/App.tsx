@@ -1,11 +1,59 @@
-import { StyleSheet, Text, View } from 'react-native';
-
-import * as ExpoHealthKit from 'expo-healthkit';
+import ExpoHealthKit, {
+  HKAuthorizationRequestStatus,
+  HKQuantityTypeIdentifier,
+  HKStatisticsOptions,
+  useHealthKitAuthorization,
+} from "expo-healthkit";
+import { useEffect } from "react-better-effect";
+import { StyleSheet, Text, View } from "react-native";
 
 export default function App() {
+  const { authorizationStatus, requestAuthorization } =
+    useHealthKitAuthorization([HKQuantityTypeIdentifier.stepCount], []);
+
+  useEffect(
+    ($) => {
+      (async () => {
+        console.log("🚀 ~ status:", authorizationStatus);
+        if (
+          authorizationStatus === HKAuthorizationRequestStatus.shouldRequest
+        ) {
+          await $.requestAuthorization();
+        }
+
+        const statisticsCollection =
+          await ExpoHealthKit.queryStatisticsCollectionForQuantity({
+            quantityType: HKQuantityTypeIdentifier.stepCount,
+            options: [HKStatisticsOptions.cumulativeSum],
+            anchor: new Date(),
+            interval: {
+              hour: 1,
+            },
+          });
+        console.log(
+          "🚀 ~ statisticsCollection:",
+          JSON.stringify(statisticsCollection, null, 2),
+        );
+
+        const statistics = await ExpoHealthKit.queryStatisticsForQuantity({
+          quantityType: HKQuantityTypeIdentifier.stepCount,
+          options: [HKStatisticsOptions.cumulativeSum],
+        });
+        console.log("🚀 ~ statistics:", JSON.stringify(statistics, null, 2));
+      })();
+    },
+    [authorizationStatus],
+    { requestAuthorization },
+  );
+
   return (
     <View style={styles.container}>
-      <Text>{ExpoHealthKit.hello()}</Text>
+      <Text
+        style={styles.text}
+      >{`isHealthDataAvailable: ${ExpoHealthKit.isHealthDataAvailable()}`}</Text>
+      <Text
+        style={styles.text}
+      >{`supportsHealthRecords: ${ExpoHealthKit.supportsHealthRecords()}`}</Text>
     </View>
   );
 }
@@ -13,8 +61,12 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+  text: {
+    color: "#000",
   },
 });

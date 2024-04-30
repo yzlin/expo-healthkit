@@ -1,26 +1,34 @@
-import { NativeModulesProxy, EventEmitter, Subscription } from 'expo-modules-core';
+import "expo-modules-core";
 
-// Import the native module. On web, it will be resolved to ExpoHealthKit.web.ts
-// and on native platforms to ExpoHealthKit.ts
-import ExpoHealthKitModule from './ExpoHealthKitModule';
-import ExpoHealthKitView from './ExpoHealthKitView';
-import { ChangeEventPayload, ExpoHealthKitViewProps } from './ExpoHealthKit.types';
+import {
+  getRequestStatusForAuthorization,
+  isHealthDataAvailable,
+  queryStatisticsCollectionForQuantity,
+  queryStatisticsForQuantity,
+  supportsHealthRecords,
+} from "./native-functions";
 
-// Get the native constant value.
-export const PI = ExpoHealthKitModule.PI;
+export * from "./ExpoHealthKit.types";
 
-export function hello(): string {
-  return ExpoHealthKitModule.hello();
-}
+export * from "./hooks";
+export * from "./types";
+export * from "./native-functions";
 
-export async function setValueAsync(value: string) {
-  return await ExpoHealthKitModule.setValueAsync(value);
-}
+// const emitter = new EventEmitter(
+//   ExpoHealthKitModule ?? NativeModulesProxy.ExpoHealthKit,
+// );
 
-const emitter = new EventEmitter(ExpoHealthKitModule ?? NativeModulesProxy.ExpoHealthKit);
+// function addChangeListener(
+//   listener: (event: ChangeEventPayload) => void,
+// ): Subscription {
+//   return emitter.addListener<ChangeEventPayload>("onChange", listener);
+// }
 
-export function addChangeListener(listener: (event: ChangeEventPayload) => void): Subscription {
-  return emitter.addListener<ChangeEventPayload>('onChange', listener);
-}
-
-export { ExpoHealthKitView, ExpoHealthKitViewProps, ChangeEventPayload };
+export default {
+  isHealthDataAvailable,
+  supportsHealthRecords,
+  getRequestStatusForAuthorization,
+  queryStatisticsCollectionForQuantity,
+  queryStatisticsForQuantity,
+  // addChangeListener,
+};

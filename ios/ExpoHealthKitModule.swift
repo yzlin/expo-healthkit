@@ -1,43 +1,153 @@
 import ExpoModulesCore
+import HealthKit
 
 public class ExpoHealthKitModule: Module {
-  // Each module class must implement the definition function. The definition consists of components
-  // that describes the module's functionality and behavior.
-  // See https://docs.expo.dev/modules/module-api for more details about available components.
+  private var store: HKHealthStore?
+  private var runningQueries: [String: HKQuery] = [:]
+
   public func definition() -> ModuleDefinition {
-    // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
-    // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
-    // The module will be accessible from `requireNativeModule('ExpoHealthKit')` in JavaScript.
     Name("ExpoHealthKit")
 
-    // Sets constant properties on the module. Can take a dictionary or a closure that returns a dictionary.
-    Constants([
-      "PI": Double.pi
-    ])
-
-    // Defines event names that the module can send to JavaScript.
-    Events("onChange")
-
-    // Defines a JavaScript synchronous function that runs the native code on the JavaScript thread.
-    Function("hello") {
-      return "Hello world! 👋"
+    OnCreate {
+      if HKHealthStore.isHealthDataAvailable() {
+        self.store = HKHealthStore()
+      }
     }
 
-    // Defines a JavaScript function that always returns a Promise and whose native code
-    // is by default dispatched on the different thread than the JavaScript runtime runs on.
-    AsyncFunction("setValueAsync") { (value: String) in
-      // Send an event to JavaScript.
-      self.sendEvent("onChange", [
-        "value": value
-      ])
+    OnDestroy {
+      if let store = store {
+        for query in runningQueries {
+          store.stop(query.value)
+        }
+      }
     }
 
-    // Enables the module to be used as a native view. Definition components that are accepted as part of the
-    // view definition: Prop, Events.
-    View(ExpoHealthKitView.self) {
-      // Defines a setter for the `name` prop.
-      Prop("name") { (view: ExpoHealthKitView, prop: String) in
-        print(prop)
+    Function("isHealthDataAvailable") {
+      HKHealthStore.isHealthDataAvailable()
+    }
+
+    Function("supportsHealthRecords") {
+      guard let store = store else {
+        throw InvalidStoreException()
+      }
+
+      return store.supportsHealthRecords()
+    }
+
+    AsyncFunction("getRequestStatusForAuthorization") { (share: [String], read: [String], promise: Promise) in
+      guard let store = store else {
+        throw InvalidStoreException()
+      }
+
+      let share = parseSampleTypes(share)
+      let read = parseObjectTypes(read)
+      store.getRequestStatusForAuthorization(toShare: share, read: read) { status, error in
+        if let error = error {
+          promise.reject(error)
+          return
+        }
+
+        promise.resolve(status.rawValue)
+      }
+    }
+
+    AsyncFunction("requestAuthorization") { (share: [String], read: [String], promise: Promise) in
+      guard let store = store else {
+        throw InvalidStoreException()
+      }
+
+      let share = parseSampleTypes(share)
+      let read = parseObjectTypes(read)
+      store.requestAuthorization(toShare: share, read: read) { success, error in
+        if let error = error {
+          promise.reject(error)
+          return
+        }
+
+        promise.resolve(success)
+      }
+    }
+
+    AsyncFunction("getPreferredUnits") { (identifiers: [String], promise: Promise) in
+      guard let store = store else {
+        throw InvalidStoreException()
+      }
+
+      var quantityTypes = Set<HKQuantityType>()
+      for identifier in identifiers {
+        let identifier = HKQuantityTypeIdentifier(rawValue: identifier)
+        if let quantityType = HKSampleType.quantityType(forIdentifier: identifier) {
+          quantityTypes.insert(quantityType)
+        }
+      }
+
+      store.preferredUnits(for: quantityTypes) { typePerUnits, error in
+        if let error = error {
+          promise.reject(error)
+          return
+        }
+
+        var result = [String: String]()
+
+        for (quantityType, unit) in typePerUnits {
+          result.updateValue(unit.unitString, forKey: quantityType.identifier)
+        }
+
+        promise.resolve(result)
+      }
+    }
+
+    AsyncFunction("queryStatisticsForQuantity") { (options: QueryStatisticsOptions, promise: Promise) in
+      guard let store = store else {
+        throw InvalidStoreException()
+      }
+
+      do {
+        let quantityType = try options.quantityType
+
+        let predicate = HKQuery.predicateForSamples(withStart: options.startDate, end: options.endDate, options: .strictEndDate)
+
+        let query = HKStatisticsQuery(quantityType: quantityType, quantitySamplePredicate: predicate, options: options.statisticsOptions) { _, statistics, _ in
+          guard let statistics = statistics else {
+            promise.resolve(nil)
+            return
+          }
+
+          promise.resolve(statistics.expoData(for: options.unit))
+        }
+
+        store.execute(query)
+      } catch {
+        promise.reject(error)
+      }
+    }
+
+    AsyncFunction("queryStatisticsCollectionForQuantity") { (options: QueryStatisticsCollectionOptions, promise: Promise) in
+      guard let store = store else {
+        throw InvalidStoreException()
+      }
+
+      do {
+        let quantityType = try options.quantityType
+
+        let predicate = HKQuery.predicateForSamples(withStart: options.startDate, end: options.endDate, options: .strictEndDate)
+
+        let anchorDate = try options.anchorDate
+
+        let query = HKStatisticsCollectionQuery(quantityType: quantityType, quantitySamplePredicate: predicate, options: options.statisticsOptions, anchorDate: anchorDate, intervalComponents: options.interval.dateComponents())
+
+        query.initialResultsHandler = { _, statisticsCollection, _ in
+          guard let statisticsCollection = statisticsCollection else {
+            promise.resolve(nil)
+            return
+          }
+
+          promise.resolve(statisticsCollection.expoData(for: options.unit))
+        }
+
+        store.execute(query)
+      } catch {
+        promise.reject(error)
       }
     }
   }

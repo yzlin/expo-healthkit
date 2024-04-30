@@ -16,17 +16,20 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "expo.modules.healthkit.example"
+      "bundleIdentifier": "com.yzlin.healthkit.example"
     },
+    "plugins": [
+      [
+        "../app.plugin.js",
+        {
+          "NSHealthShareUsageDescription": "This app needs access to your health data to show you your daily activity.",
+          "NSHealthUpdateUsageDescription": false,
+          "background": true
+        }
+      ]
+    ],
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "expo.modules.healthkit.example"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
+      "package": "com.yzlin.healthkit.example"
     }
   }
 }
