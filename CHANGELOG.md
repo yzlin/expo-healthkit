@@ -1,3 +1,10 @@
+## v0.3.1 (2024-05-01)
+
+### Fix
+
+- should not limit RN version
+- **example**: example should use scoped package name
+
 ## v0.3.0 (2024-04-30)
 
 ### Feat
