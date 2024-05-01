@@ -3,8 +3,12 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "expo-healthkit": ["../src/index"],
-      "expo-healthkit/*": ["../src/*"]
+      "@yzlin/expo-healthkit": [
+        "../src/index"
+      ],
+      "@yzlin/expo-healthkit/*": [
+        "../src/*"
+      ]
     }
   }
 }

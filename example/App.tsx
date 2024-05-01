@@ -4,7 +4,7 @@ import ExpoHealthKit, {
   HKQuantityTypeIdentifier,
   HKStatisticsOptions,
   useHealthKitAuthorization,
-} from "expo-healthkit";
+} from "@yzlin/expo-healthkit";
 import { useEffect } from "react-better-effect";
 import { StyleSheet, Text, View } from "react-native";
 
