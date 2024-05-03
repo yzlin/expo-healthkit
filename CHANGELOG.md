@@ -1,3 +1,9 @@
+## v0.4.1 (2024-05-03)
+
+### Fix
+
+- missing HKActivitySummaryTypeIdentifier for permission request
+
 ## v0.4.0 (2024-05-03)
 
 ### Feat
