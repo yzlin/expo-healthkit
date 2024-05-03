@@ -1,4 +1,5 @@
 import ExpoHealthKit, {
+  HKActivitySummaryTypeIdentifier,
   HKAuthorizationRequestStatus,
   HKCharacteristicTypeIdentifier,
   HKQuantityTypeIdentifier,
@@ -14,6 +15,7 @@ export default function App() {
       [
         HKQuantityTypeIdentifier.stepCount,
         HKCharacteristicTypeIdentifier.biologicalSex,
+        HKActivitySummaryTypeIdentifier,
       ],
       [],
     );

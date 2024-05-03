@@ -791,29 +791,6 @@ export type HKQuantity<
   readonly quantity: number;
 };
 
-export type HKActivitySummaryQuantity<TUnit extends HKUnit = HKUnit> = {
-  readonly unit: TUnit;
-  readonly quantity: number;
-};
-
-export type ReadPermissions = readonly (
-  | HKCategoryTypeIdentifier
-  | HKCharacteristicTypeIdentifier
-  | HKQuantityTypeIdentifier
-)[];
-
-export type WritePermissions = readonly (
-  | HKCategoryTypeIdentifier
-  | HKCharacteristicTypeIdentifier
-  | HKQuantityTypeIdentifier
-)[];
-
-export enum HKAuthorizationRequestStatus {
-  unknown = 0,
-  shouldRequest = 1,
-  unnecessary = 2,
-}
-
 // Unit types are a straight mapping from here https://developer.apple.com/documentation/healthkit/hkunit/1615733-init
 export enum HKMetricPrefix {
   None = "",
