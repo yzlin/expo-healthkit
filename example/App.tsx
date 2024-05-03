@@ -50,6 +50,12 @@ export default function App() {
           options: [HKStatisticsOptions.cumulativeSum],
         });
         console.log("🚀 ~ statistics:", JSON.stringify(statistics, null, 2));
+
+        const summaries = await ExpoHealthKit.queryActivitySummary({
+          from: addDays(new Date(), -1),
+          to: new Date(),
+        });
+        console.log("🚀 ~ summaries:", summaries);
       })();
     },
     [authorizationStatus],
@@ -80,3 +86,9 @@ const styles = StyleSheet.create({
     color: "#000",
   },
 });
+
+function addDays(date: Date, days: number): Date {
+  const newDate = new Date(date);
+  newDate.setDate(newDate.getDate() + days);
+  return newDate;
+}

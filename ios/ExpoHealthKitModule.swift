@@ -163,5 +163,28 @@ public class ExpoHealthKitModule: Module {
         promise.reject(error)
       }
     }
+
+    AsyncFunction("queryActivitySummary") { (options: QueryActivitySummaryOptions, promise: Promise) in
+      guard let store = store else {
+        throw InvalidStoreException()
+      }
+
+      do {
+        let predicate = try HKQuery.predicate(forActivitySummariesBetweenStart: options.startDateComponents, end: options.endDateComponents)
+
+        let query = HKActivitySummaryQuery(predicate: predicate) { _, summaries, _ in
+          guard let summaries = summaries else {
+            promise.resolve(nil)
+            return
+          }
+
+          promise.resolve(summaries.map { $0.expoData() })
+        }
+
+        store.execute(query)
+      } catch {
+        promise.reject(error)
+      }
+    }
   }
 }

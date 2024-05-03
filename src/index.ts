@@ -4,6 +4,7 @@ import {
   getBiologicalSex,
   getRequestStatusForAuthorization,
   isHealthDataAvailable,
+  queryActivitySummary,
   queryStatisticsCollectionForQuantity,
   queryStatisticsForQuantity,
   supportsHealthRecords,
@@ -36,5 +37,9 @@ export default {
   // Query Statistics
   queryStatisticsCollectionForQuantity,
   queryStatisticsForQuantity,
+
+  // Query Activity Summary
+  queryActivitySummary,
+
   // addChangeListener,
 };

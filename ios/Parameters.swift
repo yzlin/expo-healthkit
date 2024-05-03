@@ -198,3 +198,47 @@ extension QueryStatisticsCollectionOptions {
     return opts
   }
 }
+
+struct QueryActivitySummaryOptions: Record {
+  @Field
+  var from: String
+
+  @Field
+  var to: String
+}
+
+extension QueryActivitySummaryOptions {
+  var startDate: Date {
+    get throws {
+      guard let date = RFC3339DateFormatter.date(from: from) else {
+        throw InvalidDateException(from)
+      }
+      return date
+    }
+  }
+
+  var startDateComponents: DateComponents {
+    get throws {
+      var dateComponents = try Calendar.current.dateComponents([.day, .month, .year, .era], from: startDate)
+      dateComponents.calendar = Calendar.current
+      return dateComponents
+    }
+  }
+
+  var endDate: Date {
+    get throws {
+      guard let date = RFC3339DateFormatter.date(from: to) else {
+        throw InvalidDateException(to)
+      }
+      return date
+    }
+  }
+
+  var endDateComponents: DateComponents {
+    get throws {
+      var dateComponents = try Calendar.current.dateComponents([.day, .month, .year, .era], from: endDate)
+      dateComponents.calendar = Calendar.current
+      return dateComponents
+    }
+  }
+}

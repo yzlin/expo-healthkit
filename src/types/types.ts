@@ -791,6 +791,11 @@ export type HKQuantity<
   readonly quantity: number;
 };
 
+export type HKActivitySummaryQuantity<TUnit extends HKUnit = HKUnit> = {
+  readonly unit: TUnit;
+  readonly quantity: number;
+};
+
 export type ReadPermissions = readonly (
   | HKCategoryTypeIdentifier
   | HKCharacteristicTypeIdentifier
