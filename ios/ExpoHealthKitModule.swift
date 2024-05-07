@@ -15,7 +15,7 @@ public class ExpoHealthKitModule: Module {
     }
 
     OnDestroy {
-      if let store = store {
+      if let store {
         for query in runningQueries {
           store.stop(query.value)
         }
@@ -27,7 +27,7 @@ public class ExpoHealthKitModule: Module {
     }
 
     Function("supportsHealthRecords") {
-      guard let store = store else {
+      guard let store else {
         throw InvalidStoreException()
       }
 
@@ -35,14 +35,15 @@ public class ExpoHealthKitModule: Module {
     }
 
     AsyncFunction("getRequestStatusForAuthorization") { (share: [String], read: [String], promise: Promise) in
-      guard let store = store else {
-        throw InvalidStoreException()
+      guard let store else {
+        promise.reject(InvalidStoreException())
+        return
       }
 
       let share = parseSampleTypes(share)
       let read = parseObjectTypes(read)
       store.getRequestStatusForAuthorization(toShare: share, read: read) { status, error in
-        if let error = error {
+        if let error {
           promise.reject(error)
           return
         }
@@ -52,14 +53,15 @@ public class ExpoHealthKitModule: Module {
     }
 
     AsyncFunction("requestAuthorization") { (share: [String], read: [String], promise: Promise) in
-      guard let store = store else {
-        throw InvalidStoreException()
+      guard let store else {
+        promise.reject(InvalidStoreException())
+        return
       }
 
       let share = parseSampleTypes(share)
       let read = parseObjectTypes(read)
       store.requestAuthorization(toShare: share, read: read) { success, error in
-        if let error = error {
+        if let error {
           promise.reject(error)
           return
         }
@@ -69,8 +71,9 @@ public class ExpoHealthKitModule: Module {
     }
 
     AsyncFunction("getPreferredUnits") { (identifiers: [String], promise: Promise) in
-      guard let store = store else {
-        throw InvalidStoreException()
+      guard let store else {
+        promise.reject(InvalidStoreException())
+        return
       }
 
       var quantityTypes = Set<HKQuantityType>()
@@ -82,7 +85,7 @@ public class ExpoHealthKitModule: Module {
       }
 
       store.preferredUnits(for: quantityTypes) { typePerUnits, error in
-        if let error = error {
+        if let error {
           promise.reject(error)
           return
         }
@@ -98,8 +101,9 @@ public class ExpoHealthKitModule: Module {
     }
 
     AsyncFunction("getBiologicalSex") { (promise: Promise) in
-      guard let store = store else {
-        throw InvalidStoreException()
+      guard let store else {
+        promise.reject(InvalidStoreException())
+        return
       }
 
       do {
@@ -111,8 +115,9 @@ public class ExpoHealthKitModule: Module {
     }
 
     AsyncFunction("queryStatisticsForQuantity") { (options: QueryStatisticsOptions, promise: Promise) in
-      guard let store = store else {
-        throw InvalidStoreException()
+      guard let store else {
+        promise.reject(InvalidStoreException())
+        return
       }
 
       do {
@@ -121,7 +126,7 @@ public class ExpoHealthKitModule: Module {
         let predicate = HKQuery.predicateForSamples(withStart: options.startDate, end: options.endDate, options: .strictEndDate)
 
         let query = HKStatisticsQuery(quantityType: quantityType, quantitySamplePredicate: predicate, options: options.statisticsOptions) { _, statistics, _ in
-          guard let statistics = statistics else {
+          guard let statistics else {
             promise.resolve(nil)
             return
           }
@@ -136,8 +141,9 @@ public class ExpoHealthKitModule: Module {
     }
 
     AsyncFunction("queryStatisticsCollectionForQuantity") { (options: QueryStatisticsCollectionOptions, promise: Promise) in
-      guard let store = store else {
-        throw InvalidStoreException()
+      guard let store else {
+        promise.reject(InvalidStoreException())
+        return
       }
 
       do {
@@ -166,19 +172,55 @@ public class ExpoHealthKitModule: Module {
 
     AsyncFunction("queryActivitySummary") { (options: QueryActivitySummaryOptions, promise: Promise) in
       guard let store = store else {
-        throw InvalidStoreException()
+        promise.reject(InvalidStoreException())
+        return
       }
 
       do {
         let predicate = try HKQuery.predicate(forActivitySummariesBetweenStart: options.startDateComponents, end: options.endDateComponents)
 
         let query = HKActivitySummaryQuery(predicate: predicate) { _, summaries, _ in
-          guard let summaries = summaries else {
+          guard let summaries else {
             promise.resolve(nil)
             return
           }
 
           promise.resolve(summaries.map { $0.expoData() })
+        }
+
+        store.execute(query)
+      } catch {
+        promise.reject(error)
+      }
+    }
+
+    AsyncFunction("queryWorkouts") { (options: QueryWorkoutsOptions, promise: Promise) in
+      guard let store = store else {
+        promise.reject(InvalidStoreException())
+        return
+      }
+
+      do {
+        let predicate = try HKQuery.predicateForSamples(withStart: options.startDate, end: options.endDate, options: [.strictStartDate, .strictEndDate])
+        let limit = options.limit ?? HKObjectQueryNoLimit
+
+        let query = HKSampleQuery(sampleType: .workoutType(), predicate: predicate, limit: limit, sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: options.ascending)]) { _, samples, error in
+          if let error {
+            promise.reject(error)
+            return
+          }
+
+          guard let samples else {
+            promise.resolve([])
+            return
+          }
+
+          guard let workouts = samples as? [HKWorkout] else {
+            promise.resolve([])
+            return
+          }
+
+          promise.resolve(workouts.map { $0.expoData(energyUnit: options.energyUnit, distanceUnit: options.distanceUnit) })
         }
 
         store.execute(query)

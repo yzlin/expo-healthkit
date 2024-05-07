@@ -4,12 +4,14 @@ import type {
   HKCharacteristicTypeIdentifier,
   HKQuantityTypeIdentifier,
 } from "./types";
+import type { HKWorkoutTypeIdentifier } from "./workout";
 
 export type ReadPermissions = readonly (
   | HKCategoryTypeIdentifier
   | HKCharacteristicTypeIdentifier
   | HKQuantityTypeIdentifier
   | typeof HKActivitySummaryTypeIdentifier
+  | typeof HKWorkoutTypeIdentifier
 )[];
 
 export type WritePermissions = readonly (
@@ -17,6 +19,7 @@ export type WritePermissions = readonly (
   | HKCharacteristicTypeIdentifier
   | HKQuantityTypeIdentifier
   | typeof HKActivitySummaryTypeIdentifier
+  | typeof HKWorkoutTypeIdentifier
 )[];
 
 export enum HKAuthorizationRequestStatus {

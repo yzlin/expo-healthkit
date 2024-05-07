@@ -4,6 +4,7 @@ import ExpoHealthKit, {
   HKCharacteristicTypeIdentifier,
   HKQuantityTypeIdentifier,
   HKStatisticsOptions,
+  HKWorkoutTypeIdentifier,
   useHealthKitAuthorization,
 } from "@yzlin/expo-healthkit";
 import { useEffect } from "react-better-effect";
@@ -16,6 +17,7 @@ export default function App() {
         HKQuantityTypeIdentifier.stepCount,
         HKCharacteristicTypeIdentifier.biologicalSex,
         HKActivitySummaryTypeIdentifier,
+        HKWorkoutTypeIdentifier,
       ],
       [],
     );
@@ -58,6 +60,12 @@ export default function App() {
           to: new Date(),
         });
         console.log("🚀 ~ summaries:", summaries);
+
+        const workouts = await ExpoHealthKit.queryWorkouts({
+          from: new Date("2019-01-01"),
+          limit: 10,
+        });
+        console.log("🚀 ~ workouts:", JSON.stringify(workouts, null, 2));
       })();
     },
     [authorizationStatus],

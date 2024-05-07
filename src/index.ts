@@ -7,6 +7,7 @@ import {
   queryActivitySummary,
   queryStatisticsCollectionForQuantity,
   queryStatisticsForQuantity,
+  queryWorkouts,
   supportsHealthRecords,
 } from "./native-functions";
 
@@ -40,6 +41,9 @@ export default {
 
   // Query Activity Summary
   queryActivitySummary,
+
+  // Query Workouts
+  queryWorkouts,
 
   // addChangeListener,
 };
