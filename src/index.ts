@@ -1,6 +1,14 @@
-import "expo-modules-core";
-
 import {
+  EventEmitter,
+  NativeModulesProxy,
+  type Subscription,
+} from "expo-modules-core";
+
+import ExpoHealthKitModule from "./ExpoHealthKitModule";
+import {
+  disableAllBackgroundDelivery,
+  disableBackgroundDelivery,
+  enableBackgroundDelivery,
   getBiologicalSex,
   getRequestStatusForAuthorization,
   isHealthDataAvailable,
@@ -8,24 +16,28 @@ import {
   queryStatisticsCollectionForQuantity,
   queryStatisticsForQuantity,
   queryWorkouts,
+  subscribeToQuery,
   supportsHealthRecords,
+  unsubscribeFromQuery,
 } from "./native-functions";
-
-export * from "./ExpoHealthKit.types";
+import { Events, type QueryUpdateEventPayload } from "./types";
 
 export * from "./hooks";
 export * from "./types";
 export * from "./native-functions";
 
-// const emitter = new EventEmitter(
-//   ExpoHealthKitModule ?? NativeModulesProxy.ExpoHealthKit,
-// );
+const emitter = new EventEmitter(
+  ExpoHealthKitModule ?? NativeModulesProxy.ExpoHealthKit,
+);
 
-// function addChangeListener(
-//   listener: (event: ChangeEventPayload) => void,
-// ): Subscription {
-//   return emitter.addListener<ChangeEventPayload>("onChange", listener);
-// }
+function addQueryUpdateListener(
+  listener: (event: QueryUpdateEventPayload) => void,
+): Subscription {
+  return emitter.addListener<QueryUpdateEventPayload>(
+    Events.ON_QUERY_UPDATE,
+    listener,
+  );
+}
 
 export default {
   isHealthDataAvailable,
@@ -45,5 +57,13 @@ export default {
   // Query Workouts
   queryWorkouts,
 
-  // addChangeListener,
+  // Observation
+  enableBackgroundDelivery,
+  disableAllBackgroundDelivery,
+  disableBackgroundDelivery,
+  subscribeToQuery,
+  unsubscribeFromQuery,
+
+  // Event
+  addQueryUpdateListener,
 };

@@ -9,6 +9,12 @@ import ExpoModulesCore
 
 class InvalidStoreException: Exception {}
 
+class InvalidType: GenericException<String> {
+  override var reason: String {
+    "Invalid type: \(param)"
+  }
+}
+
 class InvalidQuantityTypeException: Exception {}
 
 class InvalidDateException: GenericException<String> {

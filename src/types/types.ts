@@ -1,3 +1,34 @@
+import type { HKActivitySummaryTypeIdentifier } from "./activity-summary";
+import type { HKWorkoutTypeIdentifier } from "./workout";
+
+/**
+ * Represents an audiogram type identifier.
+ * @see {@link https://developer.apple.com/documentation/healthkit/HKAudiogramSampleType Apple Docs HKAudiogramSampleType}
+ */
+export const HKAudiogramTypeIdentifier = "HKAudiogramSampleType" as const;
+
+/**
+ * Represents a workout route type identifier.
+ * @see {@link https://developer.apple.com/documentation/healthkit/hkworkoutroutetypeidentifier Apple Docs HKWorkoutRouteTypeIdentifier}
+ */
+export const HKWorkoutRouteTypeIdentifier =
+  "HKWorkoutRouteTypeIdentifier" as const;
+
+/**
+ * Represents a series sample containing heartbeat data..
+ * @see {@link https://developer.apple.com/documentation/healthkit/HKDataTypeIdentifierHeartbeatSeries Apple Docs HKDataTypeIdentifierHeartbeatSeries}
+ */
+export const HKDataTypeIdentifierHeartbeatSeries =
+  "HKDataTypeIdentifierHeartbeatSeries" as const;
+
+/**
+ * @see {@link https://developer.apple.com/documentation/healthkit/hkcorrelationtypeidentifier Apple Docs }
+ */
+export enum HKCorrelationTypeIdentifier {
+  bloodPressure = "HKCorrelationTypeIdentifierBloodPressure",
+  food = "HKCorrelationTypeIdentifierFood",
+}
+
 /**
  * @see {@link https://developer.apple.com/documentation/healthkit/hkcategorytypeidentifier Apple Docs }
  */
@@ -769,6 +800,19 @@ export enum HKQuantityTypeIdentifier {
    */
   runningSpeed = "HKQuantityTypeIdentifierRunningSpeed",
 }
+
+export type HKSampleTypeIdentifier =
+  | HKCategoryTypeIdentifier
+  | HKCorrelationTypeIdentifier
+  | HKQuantityTypeIdentifier
+  | typeof HKActivitySummaryTypeIdentifier
+  | typeof HKAudiogramTypeIdentifier
+  | typeof HKDataTypeIdentifierHeartbeatSeries
+  | typeof HKWorkoutRouteTypeIdentifier
+  | typeof HKWorkoutTypeIdentifier
+  | `${HKCategoryTypeIdentifier}`
+  | `${HKCorrelationTypeIdentifier}`
+  | `${HKQuantityTypeIdentifier}`;
 
 /**
  * @see {@link https://developer.apple.com/documentation/healthkit/hkstatisticsoptions Apple Docs }

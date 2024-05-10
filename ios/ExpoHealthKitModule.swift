@@ -4,6 +4,7 @@ import HealthKit
 public class ExpoHealthKitModule: Module {
   private var store: HKHealthStore?
   private var runningQueries: [String: HKQuery] = [:]
+  private var shouldEmitEvents: Bool = false
 
   public func definition() -> ModuleDefinition {
     Name("ExpoHealthKit")
@@ -20,6 +21,14 @@ public class ExpoHealthKitModule: Module {
           store.stop(query.value)
         }
       }
+    }
+
+    OnStartObserving {
+      shouldEmitEvents = true
+    }
+
+    OnStopObserving {
+      shouldEmitEvents = false
     }
 
     Function("isHealthDataAvailable") {
@@ -171,7 +180,7 @@ public class ExpoHealthKitModule: Module {
     }
 
     AsyncFunction("queryActivitySummary") { (options: QueryActivitySummaryOptions, promise: Promise) in
-      guard let store = store else {
+      guard let store else {
         promise.reject(InvalidStoreException())
         return
       }
@@ -195,7 +204,7 @@ public class ExpoHealthKitModule: Module {
     }
 
     AsyncFunction("queryWorkouts") { (options: QueryWorkoutsOptions, promise: Promise) in
-      guard let store = store else {
+      guard let store else {
         promise.reject(InvalidStoreException())
         return
       }
@@ -227,6 +236,128 @@ public class ExpoHealthKitModule: Module {
       } catch {
         promise.reject(error)
       }
+    }
+
+    AsyncFunction("enableBackgroundDelivery") { (typeIdentifier: String, updateFrequency: Int, promise: Promise) in
+      guard let store else {
+        promise.reject(InvalidStoreException())
+        return
+      }
+
+      guard let objectType = objectTypeFromString(typeIdentifier) else {
+        promise.reject(InvalidType("typeIdentifier"))
+        return
+      }
+
+      guard let frequency = HKUpdateFrequency(rawValue: updateFrequency) else {
+        promise.reject(InvalidType("updateFrequency"))
+        return
+      }
+
+      store.enableBackgroundDelivery(for: objectType, frequency: frequency) { success, error in
+        if let error {
+          promise.reject(error)
+          return
+        }
+
+        promise.resolve(success)
+      }
+    }
+
+    AsyncFunction("disableAllBackgroundDelivery") { (promise: Promise) in
+      guard let store else {
+        promise.reject(InvalidStoreException())
+        return
+      }
+
+      store.disableAllBackgroundDelivery { success, error in
+        if let error {
+          promise.reject(error)
+          return
+        }
+
+        promise.resolve(success)
+      }
+    }
+
+    AsyncFunction("disableBackgroundDelivery") { (typeIdentifier: String, promise: Promise) in
+      guard let store else {
+        promise.reject(InvalidStoreException())
+        return
+      }
+
+      guard let objectType = objectTypeFromString(typeIdentifier) else {
+        promise.reject(InvalidType("typeIdentifier"))
+        return
+      }
+
+      store.disableBackgroundDelivery(for: objectType) { success, error in
+        if let error {
+          promise.reject(error)
+          return
+        }
+
+        promise.resolve(success)
+      }
+    }
+
+    AsyncFunction("subscribeToQuery") { (typeIdentifier: String, promise: Promise) in
+      guard let store else {
+        promise.reject(InvalidStoreException())
+        return
+      }
+
+      guard let sampleType = sampleTypeFromString(typeIdentifier) else {
+        promise.reject(InvalidType("typeIdentifier"))
+        return
+      }
+
+      let predicate = HKQuery.predicateForSamples(withStart: Date(), end: nil, options: HKQueryOptions.strictStartDate)
+
+      let queryId = UUID().uuidString
+
+      func onQueryUpdate() {
+        guard shouldEmitEvents else {
+          return
+        }
+
+        sendEvent(Events.onQueryUpdate, [
+          "typeIdentifier": typeIdentifier
+        ])
+      }
+
+      let query = HKObserverQuery(sampleType: sampleType, predicate: predicate) { _, _, error in
+        if let error {
+          promise.reject(error)
+          return
+        }
+
+        onQueryUpdate()
+      }
+
+      store.execute(query)
+
+      runningQueries[queryId] = query
+
+      promise.resolve(queryId)
+    }
+
+    AsyncFunction("unsubscribeFromQuery") { (queryId: String, promise: Promise) in
+      guard let store else {
+        promise.reject(InvalidStoreException())
+        return
+      }
+
+      guard let query = runningQueries[queryId] else {
+        promise.reject(InvalidType("queryId"))
+        return
+      }
+
+      store.stop(query)
+
+      runningQueries.removeValue(forKey: queryId)
+
+      promise.resolve()
     }
   }
 }
