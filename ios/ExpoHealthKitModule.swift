@@ -328,13 +328,14 @@ public class ExpoHealthKitModule: Module {
         ])
       }
 
-      let query = HKObserverQuery(sampleType: sampleType, predicate: predicate) { _, _, error in
+      let query = HKObserverQuery(sampleType: sampleType, predicate: predicate) { _, completionHandler, error in
         if let error {
           promise.reject(error)
           return
         }
 
         onQueryUpdate()
+        completionHandler()
       }
 
       store.execute(query)
