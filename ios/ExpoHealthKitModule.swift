@@ -23,6 +23,8 @@ public class ExpoHealthKitModule: Module {
       }
     }
 
+    Events(HealthKitEvents.onQueryUpdate)
+
     OnStartObserving {
       shouldEmitEvents = true
     }
@@ -321,7 +323,7 @@ public class ExpoHealthKitModule: Module {
           return
         }
 
-        sendEvent(Events.onQueryUpdate, [
+        sendEvent(HealthKitEvents.onQueryUpdate, [
           "typeIdentifier": typeIdentifier
         ])
       }

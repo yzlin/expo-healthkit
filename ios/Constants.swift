@@ -17,6 +17,6 @@ let HKWorkoutTypeIdentifier = "HKWorkoutTypeIdentifier"
 let HKWorkoutRouteTypeIdentifier = "HKWorkoutRouteTypeIdentifier"
 let HKDataTypeIdentifierHeartbeatSeries = "HKDataTypeIdentifierHeartbeatSeries"
 
-struct Events {
+struct HealthKitEvents {
   static let onQueryUpdate = "onQueryUpdate"
 }
