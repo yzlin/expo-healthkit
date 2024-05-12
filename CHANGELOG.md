@@ -1,3 +1,9 @@
+## v0.6.1 (2024-05-12)
+
+### Fix
+
+- onQueryUpdate event not found
+
 ## v0.6.0 (2024-05-10)
 
 ### Feat
