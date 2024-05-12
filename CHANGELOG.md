@@ -1,3 +1,9 @@
+## v0.6.2 (2024-05-12)
+
+### Fix
+
+- should call completion handler when successfully received observed query result
+
 ## v0.6.1 (2024-05-12)
 
 ### Fix
