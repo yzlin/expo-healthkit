@@ -1,3 +1,9 @@
+## v0.7.0 (2024-05-13)
+
+### Feat
+
+- query anchored workouts
+
 ## v0.6.2 (2024-05-12)
 
 ### Fix
