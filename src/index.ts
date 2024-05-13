@@ -13,6 +13,7 @@ import {
   getRequestStatusForAuthorization,
   isHealthDataAvailable,
   queryActivitySummary,
+  queryAnchoredWorkouts,
   queryStatisticsCollectionForQuantity,
   queryStatisticsForQuantity,
   queryWorkouts,
@@ -56,6 +57,7 @@ export default {
 
   // Query Workouts
   queryWorkouts,
+  queryAnchoredWorkouts,
 
   // Observation
   enableBackgroundDelivery,

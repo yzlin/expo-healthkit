@@ -66,6 +66,15 @@ export default function App() {
           limit: 10,
         });
         console.log("🚀 ~ workouts:", JSON.stringify(workouts, null, 2));
+
+        const anchoredWorkouts = await ExpoHealthKit.queryAnchoredWorkouts({
+          from: new Date("2019-01-01"),
+          limit: 2,
+        });
+        console.log(
+          "🚀 ~ anchoredWorkouts:",
+          JSON.stringify(anchoredWorkouts, null, 2),
+        );
       })();
     },
     [authorizationStatus],

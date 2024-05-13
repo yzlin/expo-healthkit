@@ -240,6 +240,48 @@ public class ExpoHealthKitModule: Module {
       }
     }
 
+    AsyncFunction("queryAnchoredWorkouts") { (options: QueryAnchoredWorkoutsOptions, promise: Promise) in
+      guard let store else {
+        promise.reject(InvalidStoreException())
+        return
+      }
+
+      do {
+        let predicate = try HKQuery.predicateForSamples(withStart: options.startDate, end: options.endDate, options: [.strictStartDate, .strictEndDate])
+        let limit = options.limit ?? HKObjectQueryNoLimit
+
+        let query = HKAnchoredObjectQuery(type: .workoutType(), predicate: predicate, anchor: options.anchorData, limit: limit) { _, samples, deletedObjects, newAnchor, error in
+          if let error {
+            promise.reject(error)
+            return
+          }
+
+          guard let samples else {
+            promise.resolve([:])
+            return
+          }
+
+          guard let workouts = samples as? [HKWorkout] else {
+            promise.resolve([:])
+            return
+          }
+
+          let deletedObjects = deletedObjects ?? []
+
+          let result = QueryAnchoredWorkoutsResult()
+          result.workouts = workouts.map { $0.expoData(energyUnit: options.energyUnit, distanceUnit: options.distanceUnit) }
+          result.deletedObjects = deletedObjects.map { $0.expoData() }
+          result.anchor = newAnchor?.serialize()
+
+          promise.resolve(result)
+        }
+
+        store.execute(query)
+      } catch {
+        promise.reject(error)
+      }
+    }
+
     AsyncFunction("enableBackgroundDelivery") { (typeIdentifier: String, updateFrequency: Int, promise: Promise) in
       guard let store else {
         promise.reject(InvalidStoreException())

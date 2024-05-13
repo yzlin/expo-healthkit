@@ -293,3 +293,58 @@ extension QueryWorkoutsOptions {
     return [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: ascending)]
   }
 }
+
+struct QueryAnchoredWorkoutsOptions: Record {
+  @Field
+  var energyUnitIdentifier: String
+
+  @Field
+  var distanceUnitIdentifier: String
+
+  @Field
+  var from: String?
+
+  @Field
+  var to: String
+
+  @Field
+  var limit: Int?
+
+  @Field
+  var anchor: String?
+}
+
+extension QueryAnchoredWorkoutsOptions {
+  var energyUnit: HKUnit {
+    return HKUnit(from: energyUnitIdentifier)
+  }
+
+  var distanceUnit: HKUnit {
+    return HKUnit(from: distanceUnitIdentifier)
+  }
+
+  var startDate: Date? {
+    guard let from = from else {
+      return nil
+    }
+
+    return RFC3339DateFormatter.date(from: from)
+  }
+
+  var endDate: Date {
+    get throws {
+      guard let date = RFC3339DateFormatter.date(from: to) else {
+        throw InvalidDateException(to)
+      }
+      return date
+    }
+  }
+
+  var anchorData: HKQueryAnchor? {
+    guard let anchor else {
+      return nil
+    }
+
+    return HKQueryAnchor.deserialize(anchor)
+  }
+}
