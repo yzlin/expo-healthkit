@@ -1,3 +1,9 @@
+## v0.8.0 (2024-05-16)
+
+### Feat
+
+- query category samples
+
 ## v0.7.0 (2024-05-13)
 
 ### Feat
