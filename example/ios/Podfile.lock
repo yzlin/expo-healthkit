@@ -9,7 +9,7 @@ PODS:
     - ExpoModulesCore
   - ExpoFileSystem (16.0.9):
     - ExpoModulesCore
-  - ExpoHealthKit (0.6.2):
+  - ExpoHealthKit (0.7.0):
     - ExpoModulesCore
   - ExpoKeepAwake (12.8.2):
     - ExpoModulesCore
@@ -1261,7 +1261,7 @@ SPEC CHECKSUMS:
   EXFont: f20669cb266ef48b004f1eb1f2b20db96cd1df9f
   Expo: 2cdb5916749a1509cf88114f1f510bd458630eb4
   ExpoFileSystem: 74cc0fae916f9f044248433971dcfc8c3befd057
-  ExpoHealthKit: b0e5c091bc12d1c6cc2eaec48c75082668736476
+  ExpoHealthKit: ce8b9815802dbc1c149ee87365cbecc5505ade94
   ExpoKeepAwake: 0f5cad99603a3268e50af9a6eb8b76d0d9ac956c
   ExpoModulesCore: 4a8928a228569301ac4fc4a1e846713e05754d05
   FBLazyVector: f64d1e2ea739b4d8f7e4740cde18089cd97fe864

@@ -205,6 +205,45 @@ public class ExpoHealthKitModule: Module {
       }
     }
 
+    AsyncFunction("queryCategorySamples") { (options: QueryCategorySamplesOptions, promise: Promise) in
+      guard let store else {
+        promise.reject(InvalidStoreException())
+        return
+      }
+
+      do {
+        var predicate: NSPredicate? = nil
+
+        if options.from != nil || options.to != nil {
+          predicate = try HKQuery.predicateForSamples(withStart: options.startDate, end: options.endDate, options: [.strictStartDate, .strictEndDate])
+        }
+        let limit = options.limit ?? HKObjectQueryNoLimit
+
+        let query = try HKSampleQuery(sampleType: options.sampleType, predicate: predicate, limit: limit, sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: options.ascending)]) { _, samples, error in
+          if let error {
+            promise.reject(error)
+            return
+          }
+
+          guard let samples else {
+            promise.resolve([])
+            return
+          }
+
+          guard let samples = samples as? [HKCategorySample] else {
+            promise.resolve([])
+            return
+          }
+
+          promise.resolve(samples.map { $0.expoData() })
+        }
+
+        store.execute(query)
+      } catch {
+        promise.reject(error)
+      }
+    }
+
     AsyncFunction("queryWorkouts") { (options: QueryWorkoutsOptions, promise: Promise) in
       guard let store else {
         promise.reject(InvalidStoreException())

@@ -14,6 +14,7 @@ import {
   isHealthDataAvailable,
   queryActivitySummary,
   queryAnchoredWorkouts,
+  queryCategorySamples,
   queryStatisticsCollectionForQuantity,
   queryStatisticsForQuantity,
   queryWorkouts,
@@ -54,6 +55,9 @@ export default {
 
   // Query Activity Summary
   queryActivitySummary,
+
+  // Query Samples
+  queryCategorySamples,
 
   // Query Workouts
   queryWorkouts,

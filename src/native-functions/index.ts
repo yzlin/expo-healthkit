@@ -1,5 +1,6 @@
 export * from "./activity-summary";
 export * from "./authorization";
+export * from "./category";
 export * from "./characteristic";
 export * from "./common";
 export * from "./observation";

@@ -1,6 +1,7 @@
 import ExpoHealthKit, {
   HKActivitySummaryTypeIdentifier,
   HKAuthorizationRequestStatus,
+  HKCategoryTypeIdentifier,
   HKCharacteristicTypeIdentifier,
   HKQuantityTypeIdentifier,
   HKStatisticsOptions,
@@ -18,6 +19,7 @@ export default function App() {
         HKCharacteristicTypeIdentifier.biologicalSex,
         HKActivitySummaryTypeIdentifier,
         HKWorkoutTypeIdentifier,
+        HKCategoryTypeIdentifier.appleStandHour,
       ],
       [],
     );
@@ -30,6 +32,7 @@ export default function App() {
           authorizationStatus === HKAuthorizationRequestStatus.shouldRequest
         ) {
           await $.requestAuthorization();
+          return;
         }
 
         const bioSex = await ExpoHealthKit.getBiologicalSex();
@@ -75,6 +78,15 @@ export default function App() {
           "🚀 ~ anchoredWorkouts:",
           JSON.stringify(anchoredWorkouts, null, 2),
         );
+
+        const categorySamples = await ExpoHealthKit.queryCategorySamples({
+          typeIdentifier: HKCategoryTypeIdentifier.appleStandHour,
+          from: startOfDay(new Date()),
+        });
+        console.log(
+          "🚀 ~ categorySamples:",
+          JSON.stringify(categorySamples, null, 2),
+        );
       })();
     },
     [authorizationStatus],
@@ -110,4 +122,8 @@ function addDays(date: Date, days: number): Date {
   const newDate = new Date(date);
   newDate.setDate(newDate.getDate() + days);
   return newDate;
+}
+
+export function startOfDay(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
