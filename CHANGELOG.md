@@ -1,3 +1,9 @@
+## v0.8.1 (2024-05-23)
+
+### Fix
+
+- wrong time-range data aggregation for statistics query
+
 ## v0.8.0 (2024-05-16)
 
 ### Feat
