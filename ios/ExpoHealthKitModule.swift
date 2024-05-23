@@ -134,7 +134,7 @@ public class ExpoHealthKitModule: Module {
       do {
         let quantityType = try options.quantityType
 
-        let predicate = HKQuery.predicateForSamples(withStart: options.startDate, end: options.endDate, options: .strictEndDate)
+        let predicate = HKQuery.predicateForSamples(withStart: options.startDate, end: options.endDate, options: [.strictStartDate, .strictEndDate])
 
         let query = HKStatisticsQuery(quantityType: quantityType, quantitySamplePredicate: predicate, options: options.statisticsOptions) { _, statistics, _ in
           guard let statistics else {
@@ -160,7 +160,7 @@ public class ExpoHealthKitModule: Module {
       do {
         let quantityType = try options.quantityType
 
-        let predicate = HKQuery.predicateForSamples(withStart: options.startDate, end: options.endDate, options: .strictEndDate)
+        let predicate = HKQuery.predicateForSamples(withStart: options.startDate, end: options.endDate, options: [.strictStartDate, .strictEndDate])
 
         let anchorDate = try options.anchorDate
 
