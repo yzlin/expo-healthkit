@@ -1,3 +1,9 @@
+## v0.8.3 (2024-05-25)
+
+### Fix
+
+- crash when error happens while receiving observed query update
+
 ## v0.8.2 (2024-05-24)
 
 ### Fix
