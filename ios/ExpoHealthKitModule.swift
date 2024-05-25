@@ -411,7 +411,8 @@ public class ExpoHealthKitModule: Module {
 
       let query = HKObserverQuery(sampleType: sampleType, predicate: predicate) { _, completionHandler, error in
         if let error {
-          promise.reject(error)
+          print("Failed to receive observed query for \(sampleType):", error.localizedDescription)
+          completionHandler()
           return
         }
 
