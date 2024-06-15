@@ -5,5 +5,6 @@ export * from "./characteristic";
 export * from "./common";
 export * from "./observation";
 export * from "./query-statistics";
+export * from "./sample";
 export * from "./unit";
 export * from "./workout";

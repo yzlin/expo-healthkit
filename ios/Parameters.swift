@@ -299,6 +299,69 @@ extension QueryCategorySamplesOptions {
   }
 }
 
+struct QueryQuantitySamplesOptions: Record {
+  @Field
+  var typeIdentifier: String
+
+  @Field
+  var unitIdentifier: String
+
+  @Field
+  var from: String?
+
+  @Field
+  var to: String?
+
+  @Field
+  var limit: Int?
+
+  @Field
+  var ascending: Bool
+}
+
+extension QueryQuantitySamplesOptions {
+  var sampleType: HKQuantityType {
+    get throws {
+      let identifier = HKQuantityTypeIdentifier(rawValue: typeIdentifier)
+      guard let sampleType = HKSampleType.quantityType(forIdentifier: identifier) else {
+        throw InvalidQuantityTypeException()
+      }
+
+      return sampleType
+    }
+  }
+
+  var unit: HKUnit {
+    return HKUnit(from: unitIdentifier)
+  }
+
+  var startDate: Date? {
+    get throws {
+      guard let from = from else {
+        return nil
+      }
+
+      guard let date = RFC3339DateFormatter.date(from: from) else {
+        throw InvalidDateException(from)
+      }
+      return date
+    }
+  }
+
+  var endDate: Date? {
+    get throws {
+      guard let to = to else {
+        return nil
+      }
+
+      guard let date = RFC3339DateFormatter.date(from: to) else {
+        throw InvalidDateException(to)
+      }
+      return date
+    }
+  }
+}
+
 struct QueryWorkoutsOptions: Record {
   @Field
   var energyUnitIdentifier: String

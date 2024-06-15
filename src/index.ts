@@ -15,6 +15,7 @@ import {
   queryActivitySummary,
   queryAnchoredWorkouts,
   queryCategorySamples,
+  queryQuantitySamples,
   queryStatisticsCollectionForQuantity,
   queryStatisticsForQuantity,
   queryWorkouts,
@@ -57,6 +58,7 @@ export default {
   queryActivitySummary,
 
   // Query Samples
+  queryQuantitySamples,
   queryCategorySamples,
 
   // Query Workouts
