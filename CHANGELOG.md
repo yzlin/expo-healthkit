@@ -1,3 +1,9 @@
+## v0.9.0 (2024-06-15)
+
+### Feat
+
+- query quantity samples
+
 ## v0.8.3 (2024-05-25)
 
 ### Fix
