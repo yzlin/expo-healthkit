@@ -10,6 +10,7 @@ import {
   disableBackgroundDelivery,
   enableBackgroundDelivery,
   getBiologicalSex,
+  getDateOfBirth,
   getRequestStatusForAuthorization,
   isHealthDataAvailable,
   queryActivitySummary,
@@ -48,6 +49,7 @@ export default {
   getRequestStatusForAuthorization,
 
   // Characteristic
+  getDateOfBirth,
   getBiologicalSex,
 
   // Query Statistics

@@ -111,6 +111,20 @@ public class ExpoHealthKitModule: Module {
       }
     }
 
+    AsyncFunction("getDateOfBirth") { (promise: Promise) in
+      guard let store else {
+        promise.reject(InvalidStoreException())
+        return
+      }
+
+      do {
+        let dateOfBirth = try store.dateOfBirthComponents()
+        promise.resolve(RFC3339DateFormatter.string(from: dateOfBirth.date!))
+      } catch {
+        promise.reject(error)
+      }
+    }
+
     AsyncFunction("getBiologicalSex") { (promise: Promise) in
       guard let store else {
         promise.reject(InvalidStoreException())
