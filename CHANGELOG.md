@@ -1,3 +1,9 @@
+## v0.10.1 (2024-08-30)
+
+### Fix
+
+- add missing `sourceRevision` field
+
 ## v0.10.0 (2024-07-02)
 
 ### Feat
