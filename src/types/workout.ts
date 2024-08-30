@@ -1,3 +1,4 @@
+import { HKSourceRevision } from "./common";
 import type { HKDevice } from "./device";
 import type {
   HKQuantity,
@@ -140,6 +141,7 @@ export interface HKWorkout<
   totalSwimmingStrokeCount: HKQuantity<HKQuantityTypeIdentifier.swimmingStrokeCount> | null;
   workoutActivities: readonly HKWorkoutActivity[];
   workoutEvents: readonly HKWorkoutEvent[];
+  sourceRevision: HKSourceRevision;
 }
 
 export interface HKStatistics<
