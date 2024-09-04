@@ -476,7 +476,7 @@ public class ExpoHealthKitModule: Module {
         let limit = options.limit ?? HKObjectQueryNoLimit
         let anchor = options.anchorData
 
-        var result = QueryAnchoredWorkoutRoutesResult()
+        let result = QueryAnchoredWorkoutRoutesResult()
 
         let predicate = HKQuery.predicateForObjects(from: workout)
         let samples = try await withCheckedThrowingContinuation {
@@ -532,7 +532,7 @@ public class ExpoHealthKitModule: Module {
             store.execute(query)
           }
 
-          result.workouts.append(route.expoData(locations: locations))
+          result.routes.append(route.expoData(locations: locations))
         }
 
         promise.resolve(result)
