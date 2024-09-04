@@ -1,3 +1,9 @@
+## v0.11.0 (2024-09-04)
+
+### Feat
+
+- add queryAnchoredQuantitySamples & queryAnchoredWorkoutRoutes
+
 ## v0.10.1 (2024-08-30)
 
 ### Fix
