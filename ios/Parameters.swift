@@ -433,6 +433,31 @@ extension QueryAnchoredQuantitySamplesOptions {
   }
 }
 
+struct QueryWorkoutOptions: Record {
+  @Field
+  var energyUnitIdentifier: String
+
+  @Field
+  var distanceUnitIdentifier: String
+
+  @Field
+  var workoutID: String
+}
+
+extension QueryWorkoutOptions {
+  var energyUnit: HKUnit {
+    return HKUnit(from: energyUnitIdentifier)
+  }
+
+  var distanceUnit: HKUnit {
+    return HKUnit(from: distanceUnitIdentifier)
+  }
+
+  var workoutUUID: UUID? {
+    return UUID(uuidString: workoutID)
+  }
+}
+
 struct QueryWorkoutsOptions: Record {
   @Field
   var energyUnitIdentifier: String

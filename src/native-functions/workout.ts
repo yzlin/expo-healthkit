@@ -6,6 +6,45 @@ import {
   UnitOfLength,
 } from "../types";
 
+export interface QueryWorkoutOptions {
+  energyUnit?: UnitOfEnergy;
+  distanceUnit?: UnitOfLength;
+  workoutID: string;
+}
+
+export async function queryWorkout(
+  options: QueryWorkoutOptions,
+): Promise<HKWorkout<
+  NonNullable<QueryWorkoutOptions["energyUnit"]>,
+  NonNullable<QueryWorkoutOptions["distanceUnit"]>
+> | null> {
+  const workout = await ExpoHealthKitModule.queryWorkout({
+    energyUnitIdentifier: options.energyUnit ?? UnitOfEnergy.Kilocalories,
+    distanceUnitIdentifier: options.distanceUnit ?? UnitOfLength.Meter,
+    workoutID: options.workoutID,
+  });
+
+  if (!workout) {
+    return null;
+  }
+
+  return {
+    ...workout,
+    startDate: new Date(workout.startDate),
+    endDate: new Date(workout.endDate),
+    workoutActivities: workout.workoutActivities.map((activity) => ({
+      ...activity,
+      startDate: new Date(activity.startDate),
+      endDate: new Date(activity.endDate),
+    })),
+    workoutEvents: workout.workoutEvents.map((event) => ({
+      ...event,
+      startDate: new Date(event.startDate),
+      endDate: new Date(event.endDate),
+    })),
+  };
+}
+
 export interface QueryWorkoutsOptions {
   energyUnit?: UnitOfEnergy;
   distanceUnit?: UnitOfLength;

@@ -21,6 +21,7 @@ import {
   queryQuantitySamples,
   queryStatisticsCollectionForQuantity,
   queryStatisticsForQuantity,
+  queryWorkout,
   queryWorkouts,
   subscribeToQuery,
   supportsHealthRecords,
@@ -67,6 +68,7 @@ export default {
   queryAnchoredQuantitySamples,
 
   // Query Workouts
+  queryWorkout,
   queryWorkouts,
   queryAnchoredWorkouts,
   queryAnchoredWorkoutRoutes,

@@ -343,6 +343,41 @@ public class ExpoHealthKitModule: Module {
       }
     }
 
+    AsyncFunction("queryWorkout") { (options: QueryWorkoutOptions, promise: Promise) in
+      guard let store else {
+        promise.reject(InvalidStoreException())
+        return
+      }
+
+      guard let workoutID = options.workoutUUID else {
+        promise.reject(InvalidType("workoutID"))
+        return
+      }
+
+      let predicate = HKQuery.predicateForObject(with: workoutID)
+
+      let query = HKAnchoredObjectQuery(type: .workoutType(), predicate: predicate, anchor: nil, limit: HKObjectQueryNoLimit) { _, samples, _, _, error in
+        if let error {
+          promise.reject(error)
+          return
+        }
+
+        guard let samples else {
+          promise.resolve(nil)
+          return
+        }
+
+        guard let workouts = samples as? [HKWorkout] else {
+          promise.resolve(nil)
+          return
+        }
+
+        promise.resolve(workouts.first?.expoData(energyUnit: options.energyUnit, distanceUnit: options.distanceUnit))
+      }
+
+      store.execute(query)
+    }
+
     AsyncFunction("queryWorkouts") { (options: QueryWorkoutsOptions, promise: Promise) in
       guard let store else {
         promise.reject(InvalidStoreException())
