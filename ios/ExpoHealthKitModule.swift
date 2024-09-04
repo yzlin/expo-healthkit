@@ -297,6 +297,52 @@ public class ExpoHealthKitModule: Module {
       }
     }
 
+    AsyncFunction("queryAnchoredQuantitySamples") { (options: QueryAnchoredQuantitySamplesOptions, promise: Promise) in
+      guard let store else {
+        promise.reject(InvalidStoreException())
+        return
+      }
+
+      do {
+        var predicate: NSPredicate? = nil
+
+        if options.from != nil || options.to != nil {
+          predicate = try HKQuery.predicateForSamples(withStart: options.startDate, end: options.endDate, options: [.strictStartDate, .strictEndDate])
+        }
+        let limit = options.limit ?? HKObjectQueryNoLimit
+
+        let query = try HKAnchoredObjectQuery(type: options.sampleType, predicate: predicate, anchor: options.anchorData, limit: limit) { _, samples, deletedObjects, newAnchor, error in
+          if let error {
+            promise.reject(error)
+            return
+          }
+
+          guard let samples else {
+            promise.resolve([:])
+            return
+          }
+
+          guard let samples = samples as? [HKQuantitySample] else {
+            promise.resolve([:])
+            return
+          }
+
+          let deletedObjects = deletedObjects ?? []
+
+          let result = QueryAnchoredQuantitySamplesResult()
+          result.samples = samples.map { $0.expoData(for: options.unit) }
+          result.deletedObjects = deletedObjects.map { $0.expoData() }
+          result.anchor = newAnchor?.serialize()
+
+          promise.resolve(result)
+        }
+
+        store.execute(query)
+      } catch {
+        promise.reject(error)
+      }
+    }
+
     AsyncFunction("queryWorkouts") { (options: QueryWorkoutsOptions, promise: Promise) in
       guard let store else {
         promise.reject(InvalidStoreException())
@@ -369,6 +415,92 @@ public class ExpoHealthKitModule: Module {
         }
 
         store.execute(query)
+      } catch {
+        promise.reject(error)
+      }
+    }
+
+    AsyncFunction("queryAnchoredWorkoutRoutes") { (options: QueryAnchoredWorkoutRoutesOptions, promise: Promise) in
+      guard let store else {
+        promise.reject(InvalidStoreException())
+        return
+      }
+
+      guard let workoutUUID = options.workoutUUID else {
+        promise.reject(InvalidType("workoutID"))
+        return
+      }
+
+      do {
+        let workout = try await getWorkoutByID(workoutUUID)
+        guard let workout else {
+          promise.reject(InvalidType("workoutID"))
+          return
+        }
+
+        let limit = options.limit ?? HKObjectQueryNoLimit
+        let anchor = options.anchorData
+
+        var result = QueryAnchoredWorkoutRoutesResult()
+
+        let predicate = HKQuery.predicateForObjects(from: workout)
+        let samples = try await withCheckedThrowingContinuation {
+          (continuation: CheckedContinuation<[HKSample], Error>) in
+          let query = HKAnchoredObjectQuery(
+            type: HKSeriesType.workoutRoute(),
+            predicate: predicate,
+            anchor: anchor,
+            limit: limit
+          ) {
+            _, samples, _, newAnchor, error in
+
+            if let error {
+              continuation.resume(throwing: error)
+              return
+            }
+
+            guard let samples else {
+              fatalError("workoutRoute samples unexpectedly nil")
+            }
+
+            result.anchor = newAnchor?.serialize()
+            continuation.resume(returning: samples)
+          }
+
+          store.execute(query)
+        }
+
+        guard let routes = samples as? [HKWorkoutRoute] else {
+          fatalError("unexpected workout route samples")
+        }
+
+        for route in routes {
+          let locations = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<[CLLocation], Error>) in
+            var allLocations = [CLLocation]()
+
+            let query = HKWorkoutRouteQuery(route: route) { _, locations, done, error in
+              if let error {
+                continuation.resume(throwing: error)
+                return
+              }
+
+              if let locations {
+                allLocations.append(contentsOf: locations)
+              }
+
+              if done {
+                continuation.resume(returning: allLocations)
+                return
+              }
+            }
+
+            store.execute(query)
+          }
+
+          result.workouts.append(route.expoData(locations: locations))
+        }
+
+        promise.resolve(result)
       } catch {
         promise.reject(error)
       }
@@ -497,5 +629,42 @@ public class ExpoHealthKitModule: Module {
 
       promise.resolve()
     }
+  }
+
+  private func getWorkoutByID(_ workoutUUID: UUID) async throws -> HKWorkout? {
+    let workoutPredicate = HKQuery.predicateForObject(with: workoutUUID)
+
+    let samples = try await withCheckedThrowingContinuation {
+      (continuation: CheckedContinuation<[HKSample], Error>) in
+      guard let store else {
+        continuation.resume(throwing: InvalidStoreException())
+        return
+      }
+
+      let query = HKSampleQuery(
+        sampleType: HKObjectType.workoutType(),
+        predicate: workoutPredicate,
+        limit: 1,
+        sortDescriptors: nil
+      ) { _, results, error in
+        if let error {
+          continuation.resume(throwing: error)
+          return
+        }
+
+        guard let samples = results else {
+          fatalError("workout samples unexpectedly nil")
+        }
+
+        continuation.resume(returning: samples)
+      }
+      store.execute(query)
+    }
+
+    guard let workouts = samples as? [HKWorkout] else {
+      return nil
+    }
+
+    return workouts.first
   }
 }

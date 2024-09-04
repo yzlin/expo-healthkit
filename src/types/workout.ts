@@ -1,4 +1,4 @@
-import { HKSourceRevision } from "./common";
+import type { HKSourceRevision } from "./common";
 import type { HKDevice } from "./device";
 import type {
   HKQuantity,
@@ -179,4 +179,25 @@ export interface HKWorkoutEvent {
   startDate: Date;
   endDate: Date;
   metadata: Record<string, unknown>;
+}
+
+export interface HKWorkoutRoute {
+  uuid: string;
+  startDate: Date;
+  endDate: Date;
+  metadata: Record<string, unknown>;
+  sourceRevision: HKSourceRevision;
+  locations: readonly CLLocation[];
+}
+
+export interface CLLocation {
+  latitude: number;
+  longitude: number;
+  altitude: number;
+  ellipsoidalAltitude: number;
+  timestamp: Date;
+  speed: number;
+  speedAccuracy: number;
+  isProducedByAccessory: boolean;
+  isSimulatedBySoftware: boolean;
 }

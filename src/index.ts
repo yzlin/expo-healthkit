@@ -14,6 +14,8 @@ import {
   getRequestStatusForAuthorization,
   isHealthDataAvailable,
   queryActivitySummary,
+  queryAnchoredQuantitySamples,
+  queryAnchoredWorkoutRoutes,
   queryAnchoredWorkouts,
   queryCategorySamples,
   queryQuantitySamples,
@@ -62,10 +64,12 @@ export default {
   // Query Samples
   queryQuantitySamples,
   queryCategorySamples,
+  queryAnchoredQuantitySamples,
 
   // Query Workouts
   queryWorkouts,
   queryAnchoredWorkouts,
+  queryAnchoredWorkoutRoutes,
 
   // Observation
   enableBackgroundDelivery,

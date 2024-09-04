@@ -1,5 +1,10 @@
 import ExpoHealthKitModule from "../ExpoHealthKitModule";
-import { type HKWorkout, UnitOfEnergy, UnitOfLength } from "../types";
+import {
+  type HKWorkout,
+  type HKWorkoutRoute,
+  UnitOfEnergy,
+  UnitOfLength,
+} from "../types";
 
 export interface QueryWorkoutsOptions {
   energyUnit?: UnitOfEnergy;
@@ -73,7 +78,6 @@ export async function queryAnchoredWorkouts(
     limit: options.limit,
     anchor: options.anchor,
   });
-  console.log("🚀 ~ data:", JSON.stringify(data, null, 2));
 
   const workouts = data.workouts.map((workout) => ({
     ...workout,
@@ -94,5 +98,39 @@ export async function queryAnchoredWorkouts(
   return {
     ...data,
     workouts,
+  };
+}
+
+export interface QueryAnchoredWorkoutRoutesOptions {
+  workoutID: string;
+  limit?: number;
+  anchor?: string;
+}
+
+export async function queryAnchoredWorkoutRoutes(
+  options: QueryAnchoredWorkoutRoutesOptions,
+): Promise<{
+  routes: readonly HKWorkoutRoute[];
+  anchor: string | null;
+}> {
+  const data = await ExpoHealthKitModule.queryAnchoredWorkoutRoutes({
+    workoutID: options.workoutID,
+    limit: options.limit,
+    anchor: options.anchor,
+  });
+
+  const routes = data.routes.map((route) => ({
+    ...route,
+    startDate: new Date(route.startDate),
+    endDate: new Date(route.endDate),
+    locations: route.locations.map((location) => ({
+      ...location,
+      timestamp: new Date(location.timestamp),
+    })),
+  }));
+
+  return {
+    ...data,
+    routes,
   };
 }

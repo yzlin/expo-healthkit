@@ -362,6 +362,77 @@ extension QueryQuantitySamplesOptions {
   }
 }
 
+struct QueryAnchoredQuantitySamplesOptions: Record {
+  @Field
+  var typeIdentifier: String
+
+  @Field
+  var unitIdentifier: String
+
+  @Field
+  var from: String?
+
+  @Field
+  var to: String?
+
+  @Field
+  var limit: Int?
+
+  @Field
+  var anchor: String?
+}
+
+extension QueryAnchoredQuantitySamplesOptions {
+  var sampleType: HKQuantityType {
+    get throws {
+      let identifier = HKQuantityTypeIdentifier(rawValue: typeIdentifier)
+      guard let sampleType = HKSampleType.quantityType(forIdentifier: identifier) else {
+        throw InvalidQuantityTypeException()
+      }
+
+      return sampleType
+    }
+  }
+
+  var unit: HKUnit {
+    return HKUnit(from: unitIdentifier)
+  }
+
+  var startDate: Date? {
+    get throws {
+      guard let from = from else {
+        return nil
+      }
+
+      guard let date = RFC3339DateFormatter.date(from: from) else {
+        throw InvalidDateException(from)
+      }
+      return date
+    }
+  }
+
+  var endDate: Date? {
+    get throws {
+      guard let to = to else {
+        return nil
+      }
+
+      guard let date = RFC3339DateFormatter.date(from: to) else {
+        throw InvalidDateException(to)
+      }
+      return date
+    }
+  }
+
+  var anchorData: HKQueryAnchor? {
+    guard let anchor else {
+      return nil
+    }
+
+    return HKQueryAnchor.deserialize(anchor)
+  }
+}
+
 struct QueryWorkoutsOptions: Record {
   @Field
   var energyUnitIdentifier: String
@@ -457,6 +528,31 @@ extension QueryAnchoredWorkoutsOptions {
       }
       return date
     }
+  }
+
+  var anchorData: HKQueryAnchor? {
+    guard let anchor else {
+      return nil
+    }
+
+    return HKQueryAnchor.deserialize(anchor)
+  }
+}
+
+struct QueryAnchoredWorkoutRoutesOptions: Record {
+  @Field
+  var workoutID: String
+
+  @Field
+  var limit: Int?
+
+  @Field
+  var anchor: String?
+}
+
+extension QueryAnchoredWorkoutRoutesOptions {
+  var workoutUUID: UUID? {
+    return UUID(uuidString: workoutID)
   }
 
   var anchorData: HKQueryAnchor? {

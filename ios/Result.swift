@@ -18,3 +18,22 @@ struct QueryAnchoredWorkoutsResult: Record {
   @Field
   var anchor: String?
 }
+
+struct QueryAnchoredQuantitySamplesResult: Record {
+  @Field
+  var samples: [ExpoHKQuantitySample]
+
+  @Field
+  var deletedObjects: [ExpoHKDeletedObject]
+
+  @Field
+  var anchor: String?
+}
+
+struct QueryAnchoredWorkoutRoutesResult: Record {
+  @Field
+  var routes: [ExpoHKWorkoutRoute]
+
+  @Field
+  var anchor: String?
+}
