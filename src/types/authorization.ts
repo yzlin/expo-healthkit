@@ -3,6 +3,7 @@ import type {
   HKCategoryTypeIdentifier,
   HKCharacteristicTypeIdentifier,
   HKQuantityTypeIdentifier,
+  HKWorkoutRouteTypeIdentifier,
 } from "./types";
 import type { HKWorkoutTypeIdentifier } from "./workout";
 
@@ -12,6 +13,7 @@ export type ReadPermissions = readonly (
   | HKQuantityTypeIdentifier
   | typeof HKActivitySummaryTypeIdentifier
   | typeof HKWorkoutTypeIdentifier
+  | typeof HKWorkoutRouteTypeIdentifier
 )[];
 
 export type WritePermissions = readonly (
@@ -20,6 +22,7 @@ export type WritePermissions = readonly (
   | HKQuantityTypeIdentifier
   | typeof HKActivitySummaryTypeIdentifier
   | typeof HKWorkoutTypeIdentifier
+  | typeof HKWorkoutRouteTypeIdentifier
 )[];
 
 export enum HKAuthorizationRequestStatus {

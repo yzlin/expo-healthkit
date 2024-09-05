@@ -455,90 +455,84 @@ public class ExpoHealthKitModule: Module {
       }
     }
 
-    AsyncFunction("queryAnchoredWorkoutRoutes") { (options: QueryAnchoredWorkoutRoutesOptions, promise: Promise) in
+    AsyncFunction("queryAnchoredWorkoutRoutes") { (options: QueryAnchoredWorkoutRoutesOptions) in
       guard let store else {
-        promise.reject(InvalidStoreException())
-        return
+        throw InvalidStoreException()
       }
 
+      print(options)
       guard let workoutUUID = options.workoutUUID else {
-        promise.reject(InvalidType("workoutID"))
-        return
+        throw InvalidType("workoutID")
       }
 
-      do {
-        let workout = try await getWorkoutByID(workoutUUID)
-        guard let workout else {
-          promise.reject(InvalidType("workoutID"))
-          return
+      let workout = try await getWorkoutByID(workoutUUID)
+      guard let workout else {
+        throw InvalidType("workoutID")
+      }
+
+      let limit = options.limit ?? HKObjectQueryNoLimit
+      let anchor = options.anchorData
+
+      let result = QueryAnchoredWorkoutRoutesResult()
+
+      let predicate = HKQuery.predicateForObjects(from: workout)
+      let samples = try await withCheckedThrowingContinuation {
+        (continuation: CheckedContinuation<[HKSample], Error>) in
+        let query = HKAnchoredObjectQuery(
+          type: HKSeriesType.workoutRoute(),
+          predicate: predicate,
+          anchor: anchor,
+          limit: limit
+        ) {
+          _, samples, _, newAnchor, error in
+
+          if let error {
+            continuation.resume(throwing: error)
+            return
+          }
+
+          guard let samples else {
+            fatalError("workoutRoute samples unexpectedly nil")
+          }
+
+          result.anchor = newAnchor?.serialize()
+          continuation.resume(returning: samples)
         }
 
-        let limit = options.limit ?? HKObjectQueryNoLimit
-        let anchor = options.anchorData
+        store.execute(query)
+      }
 
-        let result = QueryAnchoredWorkoutRoutesResult()
+      guard let routes = samples as? [HKWorkoutRoute] else {
+        fatalError("unexpected workout route samples")
+      }
 
-        let predicate = HKQuery.predicateForObjects(from: workout)
-        let samples = try await withCheckedThrowingContinuation {
-          (continuation: CheckedContinuation<[HKSample], Error>) in
-          let query = HKAnchoredObjectQuery(
-            type: HKSeriesType.workoutRoute(),
-            predicate: predicate,
-            anchor: anchor,
-            limit: limit
-          ) {
-            _, samples, _, newAnchor, error in
+      for route in routes {
+        let locations = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<[CLLocation], Error>) in
+          var allLocations = [CLLocation]()
 
+          let query = HKWorkoutRouteQuery(route: route) { _, locations, done, error in
             if let error {
               continuation.resume(throwing: error)
               return
             }
 
-            guard let samples else {
-              fatalError("workoutRoute samples unexpectedly nil")
+            if let locations {
+              allLocations.append(contentsOf: locations)
             }
 
-            result.anchor = newAnchor?.serialize()
-            continuation.resume(returning: samples)
+            if done {
+              continuation.resume(returning: allLocations)
+              return
+            }
           }
 
           store.execute(query)
         }
 
-        guard let routes = samples as? [HKWorkoutRoute] else {
-          fatalError("unexpected workout route samples")
-        }
-
-        for route in routes {
-          let locations = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<[CLLocation], Error>) in
-            var allLocations = [CLLocation]()
-
-            let query = HKWorkoutRouteQuery(route: route) { _, locations, done, error in
-              if let error {
-                continuation.resume(throwing: error)
-                return
-              }
-
-              if let locations {
-                allLocations.append(contentsOf: locations)
-              }
-
-              if done {
-                continuation.resume(returning: allLocations)
-                return
-              }
-            }
-
-            store.execute(query)
-          }
-
-          result.routes.append(route.expoData(locations: locations))
-        }
-
-        promise.resolve(result)
-      } catch {
-        promise.reject(error)
+        result.routes.append(route.expoData(locations: locations))
       }
+
+      return result
     }
 
     AsyncFunction("enableBackgroundDelivery") { (typeIdentifier: String, updateFrequency: Int, promise: Promise) in
