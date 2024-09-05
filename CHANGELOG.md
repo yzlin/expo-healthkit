@@ -1,3 +1,9 @@
+## v0.12.1 (2024-09-05)
+
+### Fix
+
+- queryAnchoredWorkoutRoutes
+
 ## v0.12.0 (2024-09-04)
 
 ### Feat
