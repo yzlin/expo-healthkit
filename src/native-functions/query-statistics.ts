@@ -1,3 +1,5 @@
+import { Platform } from "expo-modules-core";
+
 import ExpoHealthKitModule from "../ExpoHealthKitModule";
 import { ensureUnit } from "../lib/unit";
 import type {
@@ -38,6 +40,10 @@ export async function queryStatisticsForQuantity<
 >(
   options: QueryStatisticsOptions<TIdentifier, TUnit>,
 ): Promise<QueryStatisticsResult<TIdentifier, TUnit> | null> {
+  if (Platform.OS !== "ios") {
+    return null;
+  }
+
   const unit = await ensureUnit(options.quantityType, options.unit);
   const result = await ExpoHealthKitModule.queryStatisticsForQuantity({
     typeIdentifier: options.quantityType,
@@ -91,6 +97,10 @@ export async function queryStatisticsCollectionForQuantity<
 >(
   options: QueryStatisticsCollectionOptions<TIdentifier, TUnit>,
 ): Promise<QueryStatisticsCollectionResult<TIdentifier, TUnit> | null> {
+  if (Platform.OS !== "ios") {
+    return null;
+  }
+
   const unit = await ensureUnit(options.quantityType, options.unit);
   const result = await ExpoHealthKitModule.queryStatisticsCollectionForQuantity(
     {

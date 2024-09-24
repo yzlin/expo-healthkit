@@ -1,6 +1,7 @@
 import {
   EventEmitter,
   NativeModulesProxy,
+  Platform,
   type Subscription,
 } from "expo-modules-core";
 
@@ -33,16 +34,19 @@ export * from "./hooks";
 export * from "./types";
 export * from "./native-functions";
 
-const emitter = new EventEmitter(
-  ExpoHealthKitModule ?? NativeModulesProxy.ExpoHealthKit,
-);
+const emitter =
+  Platform.OS === "ios"
+  ? new EventEmitter(ExpoHealthKitModule ?? NativeModulesProxy.ExpoHealthKit)
+    : null;
 
 function addQueryUpdateListener(
   listener: (event: QueryUpdateEventPayload) => void,
 ): Subscription {
-  return emitter.addListener<QueryUpdateEventPayload>(
-    Events.ON_QUERY_UPDATE,
-    listener,
+  return (
+    emitter?.addListener<QueryUpdateEventPayload>(
+      Events.ON_QUERY_UPDATE,
+      listener,
+    ) ?? { remove: () => {} }
   );
 }
 

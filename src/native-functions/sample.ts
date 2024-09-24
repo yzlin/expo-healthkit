@@ -1,3 +1,5 @@
+import { Platform } from "expo-modules-core";
+
 import ExpoHealthKitModule from "../ExpoHealthKitModule";
 import { ensureUnit } from "../lib/unit";
 import type {
@@ -24,6 +26,10 @@ export async function queryQuantitySamples<
 >(
   options: QueryQuantitySamplesOptions<TIdentifier, TUnit>,
 ): Promise<readonly HKQuantitySample<TIdentifier, TUnit>[]> {
+  if (Platform.OS !== "ios") {
+    return [];
+  }
+
   const unit = await ensureUnit(options.quantityType, options.unit);
   const samples = await ExpoHealthKitModule.queryQuantitySamples({
     typeIdentifier: options.quantityType,
@@ -65,6 +71,14 @@ export async function queryAnchoredQuantitySamples<
   }[];
   anchor: string | null;
 }> {
+  if (Platform.OS !== "ios") {
+    return {
+      samples: [],
+      deletedObjects: [],
+      anchor: null,
+    };
+  }
+
   const unit = await ensureUnit(options.quantityType, options.unit);
   const data = await ExpoHealthKitModule.queryAnchoredQuantitySamples({
     typeIdentifier: options.quantityType,

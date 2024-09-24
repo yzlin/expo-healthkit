@@ -1,3 +1,5 @@
+import { Platform } from "expo-modules-core";
+
 import ExpoHealthKitModule from "../ExpoHealthKitModule";
 import type { HKCategorySample, HKCategoryTypeIdentifier } from "../types";
 
@@ -16,6 +18,10 @@ export async function queryCategorySamples<
 >(
   options: QueryCategorySamplesOptions<T>,
 ): Promise<readonly HKCategorySample<T>[]> {
+  if (Platform.OS !== "ios") {
+    return [];
+  }
+
   const samples = await ExpoHealthKitModule.queryCategorySamples({
     typeIdentifier: options.typeIdentifier,
     from: options.from?.toISOString(),

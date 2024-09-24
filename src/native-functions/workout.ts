@@ -1,3 +1,5 @@
+import { Platform } from "expo-modules-core";
+
 import ExpoHealthKitModule from "../ExpoHealthKitModule";
 import {
   type HKWorkout,
@@ -18,6 +20,10 @@ export async function queryWorkout(
   NonNullable<QueryWorkoutOptions["energyUnit"]>,
   NonNullable<QueryWorkoutOptions["distanceUnit"]>
 > | null> {
+  if (Platform.OS !== "ios") {
+    return null;
+  }
+
   const workout = await ExpoHealthKitModule.queryWorkout({
     energyUnitIdentifier: options.energyUnit ?? UnitOfEnergy.Kilocalories,
     distanceUnitIdentifier: options.distanceUnit ?? UnitOfLength.Meter,
@@ -62,6 +68,10 @@ export async function queryWorkouts(
     NonNullable<QueryWorkoutsOptions["distanceUnit"]>
   >[]
 > {
+  if (Platform.OS !== "ios") {
+    return [];
+  }
+
   const workouts = await ExpoHealthKitModule.queryWorkouts({
     energyUnitIdentifier: options.energyUnit ?? UnitOfEnergy.Kilocalories,
     distanceUnitIdentifier: options.distanceUnit ?? UnitOfLength.Meter,
@@ -109,6 +119,14 @@ export async function queryAnchoredWorkouts(
   }[];
   anchor: string | null;
 }> {
+  if (Platform.OS !== "ios") {
+    return {
+      workouts: [],
+      deletedObjects: [],
+      anchor: null,
+    };
+  }
+
   const data = await ExpoHealthKitModule.queryAnchoredWorkouts({
     energyUnitIdentifier: options.energyUnit ?? UnitOfEnergy.Kilocalories,
     distanceUnitIdentifier: options.distanceUnit ?? UnitOfLength.Meter,
@@ -152,6 +170,13 @@ export async function queryAnchoredWorkoutRoutes(
   routes: readonly HKWorkoutRoute[];
   anchor: string | null;
 }> {
+  if (Platform.OS !== "ios") {
+    return {
+      routes: [],
+      anchor: null,
+    };
+  }
+
   const data = await ExpoHealthKitModule.queryAnchoredWorkoutRoutes({
     workoutID: options.workoutID,
     limit: options.limit,

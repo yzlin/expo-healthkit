@@ -1,3 +1,5 @@
+import { Platform } from "expo-modules-core";
+
 import ExpoHealthKitModule from "../ExpoHealthKitModule";
 import type {
   HKActivitySummaryQuantity,
@@ -25,6 +27,10 @@ export type QueryActivitySummaryResult = readonly {
 export async function queryActivitySummary(
   options: QueryActivitySummaryOptions,
 ): Promise<QueryActivitySummaryResult> {
+  if (Platform.OS !== "ios") {
+    return [];
+  }
+
   const result = await ExpoHealthKitModule.queryActivitySummary({
     from: options.from.toISOString(),
     to: options.to.toISOString(),
