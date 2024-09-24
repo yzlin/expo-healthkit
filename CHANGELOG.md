@@ -1,3 +1,9 @@
+## v0.12.2 (2024-09-24)
+
+### Fix
+
+- **android**: should not crash in android
+
 ## v0.12.1 (2024-09-05)
 
 ### Fix
