@@ -3,12 +3,13 @@ import { Platform } from "expo-modules-core";
 import ExpoHealthKitModule from "../ExpoHealthKitModule";
 import { HKBiologicalSex } from "../types";
 
-export async function getDateOfBirth(): Promise<Date> {
+export async function getDateOfBirth(): Promise<Date | undefined> {
   if (Platform.OS !== "ios") {
-    return new Date();
+    return;
   }
 
-  return new Date(await ExpoHealthKitModule.getDateOfBirth());
+  const dob = await ExpoHealthKitModule.getDateOfBirth();
+  return dob ? new Date(dob) : undefined;
 }
 
 export async function getBiologicalSex(): Promise<HKBiologicalSex> {

@@ -119,7 +119,11 @@ public class ExpoHealthKitModule: Module {
 
       do {
         let dateOfBirth = try store.dateOfBirthComponents()
-        promise.resolve(RFC3339DateFormatter.string(from: dateOfBirth.date!))
+        guard let date = dateOfBirth.date else {
+          promise.resolve()
+          return
+        }
+        promise.resolve(RFC3339DateFormatter.string(from: date))
       } catch {
         promise.reject(error)
       }
