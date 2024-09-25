@@ -111,22 +111,17 @@ public class ExpoHealthKitModule: Module {
       }
     }
 
-    AsyncFunction("getDateOfBirth") { (promise: Promise) in
+    AsyncFunction("getDateOfBirth") {
       guard let store else {
-        promise.reject(InvalidStoreException())
-        return
+        throw InvalidStoreException()
       }
 
-      do {
-        let dateOfBirth = try store.dateOfBirthComponents()
-        guard let date = dateOfBirth.date else {
-          promise.resolve()
-          return
-        }
-        promise.resolve(RFC3339DateFormatter.string(from: date))
-      } catch {
-        promise.reject(error)
+      let dateOfBirth = try store.dateOfBirthComponents()
+      if let date = dateOfBirth.date {
+        return RFC3339DateFormatter.string(from: date)
       }
+
+      return nil
     }
 
     AsyncFunction("getBiologicalSex") { (promise: Promise) in
