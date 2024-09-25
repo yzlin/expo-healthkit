@@ -1,6 +1,6 @@
 {
   "name": "@yzlin/expo-healthkit",
-  "version": "0.12.3",
+  "version": "0.12.4",
   "description": "Expo binding for HealthKit",
   "main": "build/index.js",
   "types": "build/index.d.ts",
