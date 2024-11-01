@@ -1,3 +1,9 @@
+## v0.14.0 (2024-11-01)
+
+### Feat
+
+- add authorizationStatusFor
+
 ## v0.13.0 (2024-11-01)
 
 ### Feat
