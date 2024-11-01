@@ -81,6 +81,19 @@ public class ExpoHealthKitModule: Module {
       }
     }
 
+    AsyncFunction("authorizationStatusFor") { (identifier: String) in
+      guard let store else {
+        throw InvalidStoreException()
+      }
+
+      guard let objectType = objectTypeFromString(identifier) else {
+        throw InvalidType("identifier")
+      }
+
+      let authStatus = store.authorizationStatus(for: objectType)
+      return authStatus.rawValue
+    }
+
     AsyncFunction("getPreferredUnits") { (identifiers: [String], promise: Promise) in
       guard let store else {
         promise.reject(InvalidStoreException())

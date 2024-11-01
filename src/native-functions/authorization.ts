@@ -3,6 +3,8 @@ import { Platform } from "expo-modules-core";
 import ExpoHealthKitModule from "../ExpoHealthKitModule";
 import {
   HKAuthorizationRequestStatus,
+  HKAuthorizationStatus,
+  type HealthkitReadAuthorization,
   type ReadPermissions,
   type WritePermissions,
 } from "../types";
@@ -33,4 +35,14 @@ export async function requestAuthorization(
     writePermissions,
     readPermissions,
   );
+}
+
+export async function authorizationStatusFor(
+  identity: HealthkitReadAuthorization,
+): Promise<HKAuthorizationStatus> {
+  if (Platform.OS !== "ios") {
+    return HKAuthorizationStatus.notDetermined;
+  }
+
+  return await ExpoHealthKitModule.authorizationStatusFor(identity);
 }

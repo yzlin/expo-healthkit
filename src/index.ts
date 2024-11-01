@@ -7,6 +7,7 @@ import {
 
 import ExpoHealthKitModule from "./ExpoHealthKitModule";
 import {
+  authorizationStatusFor,
   disableAllBackgroundDelivery,
   disableBackgroundDelivery,
   enableBackgroundDelivery,
@@ -56,6 +57,7 @@ export default {
   supportsHealthRecords,
   getRequestStatusForAuthorization,
   requestAuthorization,
+  authorizationStatusFor,
 
   // Characteristic
   getDateOfBirth,
