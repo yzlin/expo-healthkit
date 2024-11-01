@@ -24,6 +24,7 @@ import {
   queryStatisticsForQuantity,
   queryWorkout,
   queryWorkouts,
+  requestAuthorization,
   subscribeToQuery,
   supportsHealthRecords,
   unsubscribeFromQuery,
@@ -36,7 +37,7 @@ export * from "./native-functions";
 
 const emitter =
   Platform.OS === "ios"
-  ? new EventEmitter(ExpoHealthKitModule ?? NativeModulesProxy.ExpoHealthKit)
+    ? new EventEmitter(ExpoHealthKitModule ?? NativeModulesProxy.ExpoHealthKit)
     : null;
 
 function addQueryUpdateListener(
@@ -54,6 +55,7 @@ export default {
   isHealthDataAvailable,
   supportsHealthRecords,
   getRequestStatusForAuthorization,
+  requestAuthorization,
 
   // Characteristic
   getDateOfBirth,
