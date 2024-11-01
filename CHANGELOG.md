@@ -1,3 +1,9 @@
+## v0.13.0 (2024-11-01)
+
+### Feat
+
+- expose requestAuthorization
+
 ## v0.12.4 (2024-09-25)
 
 ### Fix
